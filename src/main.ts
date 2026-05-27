@@ -6,10 +6,10 @@ import {
   easeInOutQuint,
   easeInOutExpo,
   easeInOutCirc,
-} from 'js-easing-functions';
+} from "js-easing-functions";
 
 const eyes = [];
-const size = {x: 0, y: 0}; // window/canvas dimensions.
+const size = { x: 0, y: 0 }; // window/canvas dimensions.
 
 const frameTime = 16; // in ms; ~60 frames per second.
 
@@ -24,13 +24,13 @@ const timingFunctions = [
 ];
 
 const canvas = {
-  cache: document.createElement('canvas'),
-  real: document.createElement('canvas'),
+  cache: document.createElement("canvas"),
+  real: document.createElement("canvas"),
 };
 
 const context = {
-  cache: canvas.cache.getContext('2d'),
-  real: canvas.real.getContext('2d'),
+  cache: canvas.cache.getContext("2d"),
+  real: canvas.real.getContext("2d"),
 };
 
 const cleanCanvases = () => {
@@ -46,7 +46,7 @@ const draw = () => {
 };
 
 const drawEyes = () => {
-  eyes.forEach(eye => {
+  eyes.forEach((eye) => {
     eye.draw();
   });
 };
@@ -66,10 +66,12 @@ const init = () => {
   const hue = getRandomInt(0, 255);
 
   handleResize();
-  window.addEventListener('resize', handleResize);
+  window.addEventListener("resize", handleResize);
 
-  document.body.appendChild(canvas.real);
-  document.body.style.backgroundColor = `hsl(${hue}, 52.3%, 58%)`;
+  const appNode = document.querySelector<HTMLDivElement>("#app")!;
+
+  appNode.appendChild(canvas.real);
+  appNode.style.backgroundColor = `hsl(${hue}, 52.3%, 58%)`;
 
   setInterval(tick, frameTime);
   draw();
@@ -79,8 +81,8 @@ const syncCanvases = () => {
   context.real.drawImage(canvas.cache, 0, 0);
 };
 
-const tick = time => {
-  eyes.forEach(eye => {
+const tick = (time) => {
+  eyes.forEach((eye) => {
     eye.tick();
     if (eye.blinkState !== 1) {
       return;
@@ -123,7 +125,7 @@ function Eye(o) {
   }
 
   // Close any overlapping eyes.
-  eyes.forEach(eye => {
+  eyes.forEach((eye) => {
     const distance = Math.hypot(eye.x - this.x, eye.y - this.y);
     if (distance < eye.size + this.size) {
       eye.close();
@@ -153,7 +155,7 @@ function Eye(o) {
     const xCpStart = this.x - this.maxHeight + this.pointiness;
     const xCpEnd = this.x + this.maxHeight - this.pointiness;
 
-    c.fillStyle = 'white';
+    c.fillStyle = "white";
     c.beginPath();
     c.moveTo(xStart, this.y);
     c.bezierCurveTo(xCpStart, yEndNeg, xCpEnd, yEndNeg, xEnd, this.y);
@@ -161,15 +163,16 @@ function Eye(o) {
     c.closePath();
     c.fill();
 
-    c.globalCompositeOperation = 'source-atop';
-    c.fillStyle = document.body.style.backgroundColor;
+    c.globalCompositeOperation = "source-atop";
+    c.fillStyle =
+      document.querySelector<HTMLDivElement>(`#app`).style.backgroundColor;
     c.beginPath();
     c.arc(this.pX, this.pY, this.pR, 0, 2 * Math.PI);
     c.closePath();
     c.fill();
 
     const reflectionAngle = -0.6;
-    c.fillStyle = 'white';
+    c.fillStyle = "white";
     c.beginPath();
     c.arc(
       this.x + (Math.cos(reflectionAngle) * this.size) / 2,
@@ -180,7 +183,7 @@ function Eye(o) {
     );
     c.closePath();
     c.fill();
-    c.globalCompositeOperation = 'source-over';
+    c.globalCompositeOperation = "source-over";
   };
 
   this.open = () => {
@@ -217,14 +220,14 @@ function Eye(o) {
 
 init();
 
-canvas.real.addEventListener('click', e => {
-  eyes.push(new Eye({x: e.clientX, y: e.clientY}));
+canvas.real.addEventListener("click", (e) => {
+  eyes.push(new Eye({ x: e.clientX, y: e.clientY }));
 });
 
-const handleMove = e => {
+const handleMove = (e) => {
   e.preventDefault();
   const target = e.changedTouches ? e.changedTouches[0] : e;
-  eyes.forEach(eye => {
+  eyes.forEach((eye) => {
     const angle = Math.atan2(target.pageY - eye.y, target.pageX - eye.x);
     const c = Math.hypot(eye.x - target.pageX, eye.y - target.pageY);
     const d = c / Math.max(size.x, size.y);
@@ -235,8 +238,8 @@ const handleMove = e => {
   });
 };
 
-canvas.real.addEventListener('mousemove', handleMove);
-canvas.real.addEventListener('touchmove', handleMove);
+canvas.real.addEventListener("mousemove", handleMove);
+canvas.real.addEventListener("touchmove", handleMove);
 
 eyes.push(
   new Eye({
